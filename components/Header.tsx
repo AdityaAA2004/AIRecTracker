@@ -13,12 +13,12 @@ const Header = () => {
         <Link href="/" className='flex items-center gap-2'>
             <Image src={"/assets/images/expensare_logo.png"} 
             alt="Expensare Logo" width={150} height={50} />
-            <h1 className="text-xl font-semibold">Expensare</h1>
+            <h1 className="text-xl font-semibold text-black dark:text-gray-400">Expensare</h1>
         </Link>
         <div className='flex items-center space-x-4'>
           <SignedIn>
             <Link href={'/receipts'}>
-              <Button variant={'outline'}>My Expense Receipts</Button>
+              <Button className='text-black dark:text-gray-400' variant={'outline'}>My Expense Receipts</Button>
             </Link>
 
             <Link href={'/plan/manage'}>

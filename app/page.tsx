@@ -10,6 +10,7 @@ import { SignInButton } from "@clerk/nextjs";
 import { Button } from "@/components/ui/button";
 import { ArrowRight, BarChart, Check, Search, Upload } from "lucide-react";
 import Image from "next/image";
+import PDFDropComponent from "@/components/PDFDropComponent";
 export default function Home() {
   
   return (
@@ -48,7 +49,7 @@ export default function Home() {
             border-gray-200 bg-white shadow-lg overflow-hidden dark:border-gray-800
             dark:bg-gray-950">
             <div className="p-6 md:p-8">
-              <p>Drop your PDF here...</p>
+              <PDFDropComponent />
             </div>
           </div>
         </div>

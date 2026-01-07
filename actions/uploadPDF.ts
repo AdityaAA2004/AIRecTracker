@@ -4,6 +4,8 @@ import { api } from "@/convex/_generated/api";
 import convex from "@/lib/convexClient";
 import { currentUser } from "@clerk/nextjs/server"
 import { getFileDownloadUrl } from "./getFileDownloadUrl";
+import { inngest } from "@/inngest/client";
+import Events from "@/inngest/constants";
 
 export async function uploadPDF(formData: FormData) : Promise <{
     success: boolean, 
@@ -69,6 +71,13 @@ export async function uploadPDF(formData: FormData) : Promise <{
         const fileUrl = await getFileDownloadUrl(storageId);
 
         // trigger the inngest agents
+        await inngest.send({
+            name: Events.EXTRACT_DATA_FROM_PDF_AND_SAVE_TO_DB,
+            data: {
+                url: fileUrl.downloadUrl,
+                expenseFileId: receiptId
+            }
+        })
 
         return {
             success: true,

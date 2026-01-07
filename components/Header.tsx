@@ -18,7 +18,7 @@ const Header = () => {
         <div className='flex items-center space-x-4'>
           <SignedIn>
             <Link href={'/receipts'}>
-              <Button className='text-black dark:text-gray-400' variant={'outline'}>My Expense Receipts</Button>
+              <Button className='text-black dark:text-gray-400 cursor-pointer' variant={'outline'}>My Expense Receipts</Button>
             </Link>
 
             <Link href={'/plan/manage'}>

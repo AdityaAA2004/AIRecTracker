@@ -36,6 +36,7 @@ export const storeExpenseFile = mutation({
                 items: []
             }
         );
+        return expenseFileId;
     }
 });
 
@@ -176,5 +177,6 @@ export const updateExpenseFileWithAIExtractedData = mutation({
             items: args.items,
             status: "processed"
         })
+        return expenseFile.userId;
     }
 })

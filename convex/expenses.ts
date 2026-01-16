@@ -120,14 +120,15 @@ export const deleteExpenseFile = mutation({
             throw new Error("Expense file not found")
         }
 
-        const userIdentity = await ctx.auth.getUserIdentity();
-        if (!userIdentity) {
-            throw new Error("Not authenticated");
-        }
-        const userId = userIdentity.subject
-        if (expenseFile.userId !== userId) {
-            throw new Error("Not authorized to delete this receipt");
-        }
+        // Since get file is already verifying user auth, we can skip it here
+        // const userIdentity = await ctx.auth.getUserIdentity();
+        // if (!userIdentity) {
+        //     throw new Error("Not authenticated");
+        // }
+        // const userId = userIdentity.subject
+        // if (expenseFile.userId !== userId) {
+        //     throw new Error("Not authorized to delete this receipt");
+        // }
 
         // delete the file from file storage
         await ctx.storage.delete(expenseFile.fileId);

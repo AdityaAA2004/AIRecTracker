@@ -30,7 +30,8 @@
     "react": "^19.2.1",
     "react-dom": "^19.2.1",
     "tailwind-merge": "^3.4.0",
-    "zod": "^4.3.4"
+    "zod": "^4.3.4",
+    "@opentelemetry/winston-transport": "0.32.0"
   },
   "devDependencies": {
     "@convex-dev/eslint-plugin": "^1.0.0",

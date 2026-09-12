@@ -9,7 +9,9 @@ import {
 import { useUser } from '@clerk/clerk-react';
 import { useRouter } from 'next/navigation';
 import { useSchematicEntitlement } from '@schematichq/schematic-react';
-import { uploadPDF } from '@/actions/uploadPDF';
+import { useMutation } from 'convex/react';
+import { api } from '@/convex/_generated/api';
+import { finalizeUpload } from '@/actions/uploadPDF';
 import { AlertCircle, CheckCircle, CloudUpload } from 'lucide-react';
 import { Button } from './ui/button';
 function PDFDropComponent() {
@@ -18,6 +20,7 @@ function PDFDropComponent() {
   const sensors = useSensors(useSensor(PointerSensor));
   const { user } = useUser();
   const router = useRouter();
+  const generateUploadUrl = useMutation(api.expenses.generateUploadUrl);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [uploadedFiles, setUploadedFiles] = useState<Array<string>>([]);
   const {
@@ -53,9 +56,25 @@ function PDFDropComponent() {
     try {
         const newUploadedFiles: string[] = []
         for (const pdf of pdfFiles) {
-            const formData = new FormData();
-            formData.append("file", pdf);
-            const result = await uploadPDF(formData);
+            // Upload the file bytes directly from the browser to Convex storage,
+            // bypassing the server so large files don't hit Vercel's function payload limit.
+            const uploadUrl = await generateUploadUrl();
+            const uploadResponse = await fetch(uploadUrl, {
+                method: "POST",
+                headers: { "Content-Type": pdf.type },
+                body: pdf
+            });
+            if (!uploadResponse.ok) {
+                throw new Error(`Failed to upload file: ${uploadResponse.statusText}`);
+            }
+            const { storageId } = await uploadResponse.json();
+
+            const result = await finalizeUpload({
+                storageId,
+                fileName: pdf.name,
+                size: pdf.size,
+                mimeType: pdf.type
+            });
             if(!result.success) {
                 throw new Error(result.error || "Upload failed");
             }
@@ -75,7 +94,7 @@ function PDFDropComponent() {
         setIsUploading(false);
     }
 
-  }, [user, router])
+  }, [user, router, generateUploadUrl])
 
   const triggerFileInput = useCallback(()=> {
     fileInputRef.current?.click()

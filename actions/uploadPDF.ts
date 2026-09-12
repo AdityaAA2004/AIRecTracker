@@ -1,15 +1,21 @@
 'use server'
 
 import { api } from "@/convex/_generated/api";
+import { Id } from "@/convex/_generated/dataModel";
 import convex from "@/lib/convexClient";
 import { currentUser } from "@clerk/nextjs/server"
 import { getFileDownloadUrl } from "./getFileDownloadUrl";
 import { inngest } from "@/inngest/client";
 import Events from "@/inngest/constants";
 
-export async function uploadPDF(formData: FormData) : Promise <{
-    success: boolean, 
-    error: string | null, 
+export async function finalizeUpload(params: {
+    storageId: Id<"_storage">,
+    fileName: string,
+    size: number,
+    mimeType: string
+}) : Promise <{
+    success: boolean,
+    error: string | null,
     data: object | null
 }> {
     const user = await currentUser();
@@ -23,17 +29,10 @@ export async function uploadPDF(formData: FormData) : Promise <{
     }
 
     try {
-        const file = formData.get("file") as File;
-        if (!file) {
-            return {
-                success: false,
-                error: "No file provided",
-                data: null
-            }
-        }
+        const { storageId, fileName, size, mimeType } = params;
 
-        if (!file.type.includes("pdf") &&
-            file.name.toLowerCase().endsWith(".pdf")
+        if (!mimeType.includes("pdf") &&
+            fileName.toLowerCase().endsWith(".pdf")
         ) {
             return {
                 success: false,
@@ -42,30 +41,12 @@ export async function uploadPDF(formData: FormData) : Promise <{
             }
         }
 
-        const uploadUrl = await convex.mutation(api.expenses.generateUploadUrl, {}) 
-        
-        const arrayBuffer = await file.arrayBuffer();
-
-        const uploadResponse = await fetch(uploadUrl, {
-            method: 'POST',
-            headers: {
-                "Content-Type": file.type
-            },
-            body: new Uint8Array(arrayBuffer)
-        });
-
-        if (!uploadResponse.ok) {
-            throw new Error(`Failed to upload file: ${uploadResponse.statusText}`);
-        }
-
-        const { storageId } = await uploadResponse.json()
-        
         const receiptId = await convex.mutation(api.expenses.storeExpenseFile, {
             userId: user.id,
             fileId: storageId,
-            fileName: file.name,
-            size: file.size,
-            mimeType: file.type
+            fileName,
+            size,
+            mimeType
         })
 
         const fileUrl = await getFileDownloadUrl(storageId);
@@ -84,10 +65,10 @@ export async function uploadPDF(formData: FormData) : Promise <{
             error: null,
             data: {
                 receiptId,
-                fileName: file.name
+                fileName
             }
         }
-        
+
     } catch(error) {
         console.error("Server action upload error:", error)
         return {
@@ -96,6 +77,4 @@ export async function uploadPDF(formData: FormData) : Promise <{
             data: null
         }
     }
-
-   
 }

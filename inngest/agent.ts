@@ -12,7 +12,7 @@ const agentNetwork = createNetwork({
     name: "Expense file Team",
     agents: [databaseAgent, expenseFileScanningAgent],
     defaultModel: anthropic({
-        model: "claude-3-7-sonnet-20250219",
+        model: "claude-sonnet-5",
         defaultParameters: {
             max_tokens: 1000
         }

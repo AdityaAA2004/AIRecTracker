@@ -11,7 +11,7 @@ const parsePDFTool = createTool({
             // Use an AI model to parse the PDF and extract structured data
             return await step?.ai.infer("parse-pdf", {
                 model: step.ai.models.anthropic({
-                    model: "claude-3-7-sonnet-20250219",
+                    model: "claude-sonnet-5",
                     defaultParameters: {
                         max_tokens: 3094
                     }
